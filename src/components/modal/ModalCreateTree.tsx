@@ -3,8 +3,8 @@ import { IconClose } from "../../IconData";
 
 const ModalCreateTree = () => {
     return (
-        <div className="p-5 bg-gray-800 text-white max-w-80	w-full relative">
-            <h3 className="font-title leading-5">새 나무 심기</h3>
+        <div className="p-5 bg-gray-800 text-white w-80	relative">
+            <h3 className="font-title leading-5 text-gray-200">새 나무 심기</h3>
             <input
                 type="text"
                 placeholder="이름을 지어주세요."

@@ -3,8 +3,8 @@ import { IconClose } from "../../IconData";
 
 const ModalUpdateChat = () => {
     return (
-        <div className="p-5 bg-gray-800 text-white max-w-80	w-full relative">
-            <h3 className="font-title leading-5 mb-4">대화 분석방 이름 변경</h3>
+        <div className="p-5 bg-gray-800 text-white w-80	relative">
+            <h3 className="font-title leading-5 mb-4 text-gray-200">대화 분석방 이름 변경</h3>
             <p>
                 ‘<strong>친구01</strong>’의 이름을 변경합니다.
             </p>
