@@ -1,30 +1,17 @@
-import { useEffect } from "react";
-import { useChatStore } from "../../../config/store";
-import { getChatRooms } from "../../../api/chat";
-import ChatListItem from "../../../components/common/chatList/ChatListItem";
+import React from "react";
+import { ChatRoom } from "../../../config/store";
+import ChatListItem from "./ChatListItem";
 
-const ChatListContent = () => {
-    const { chatList, setChatList } = useChatStore();
+interface ChatListContentProps {
+    chatList: ChatRoom[];
+}
 
-    useEffect(() => {
-        const fetchChatRooms = async () => {
-            try {
-                const chatRooms = await getChatRooms();
-                if (Array.isArray(chatRooms)) {
-                    setChatList(chatRooms);
-                }
-            } catch (error) {
-                console.error("Failed to fetch chat rooms:", error);
-            }
-        };
-
-        fetchChatRooms();
-    }, [setChatList]);
-
+const ChatListContent: React.FC<ChatListContentProps> = ({ chatList }) => {
     return (
         <div className="select-none overflow-y-auto w-fit flex flex-col">
-            {Array.isArray(chatList) &&
-                chatList.map((item) => <ChatListItem key={item.chat_room_uuid} item={item} />)}
+            {chatList.map((item) => (
+                <ChatListItem key={item.chat_room_uuid} item={item} />
+            ))}
         </div>
     );
 };

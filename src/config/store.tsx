@@ -1,10 +1,9 @@
-import create from "zustand";
-import { axiosInstance } from "../api/axios";
+import { create } from "zustand";
 import {
     UserAccount,
     UserLevel,
-    UserTree,
     TreeItem,
+    UserTree,
     UserTreeDetail,
     UserTreeEmotionDetail,
 } from "./types";
@@ -16,22 +15,20 @@ interface ModalStore {
 
 export const useModalStore = create<ModalStore>((set) => ({
     modal: false,
-
-    setModal: (bool: boolean) =>
-        set(() => ({
-            modal: bool,
-        })),
+    setModal: (bool: boolean) => set({ modal: bool }),
 }));
 
+interface UserData {
+    user: UserAccount;
+    level: UserLevel;
+    tree: UserTree;
+    treeDetail: UserTreeDetail[];
+    treeEmotion: UserTreeEmotionDetail | object;
+    treeUuid: string;
+}
+
 interface UserStore {
-    userData: {
-        user: UserAccount;
-        level: UserLevel;
-        tree: UserTree;
-        treeDetail: UserTreeDetail[];
-        treeEmotion: UserTreeEmotionDetail | object;
-        treeUuid: string;
-    };
+    userData: UserData;
     setUserData: (data: UserAccount) => void;
     setLevelData: (data: UserLevel) => void;
     setTreeData: (data: UserTree) => void;
@@ -52,20 +49,19 @@ export const useUserStore = create<UserStore>((set) => ({
         level: {
             userLevel: 0,
             userExperience: 0,
-            forestUUID: "",
+            forestUUID: "0",
         },
         tree: {
             treeMax: 0,
             treeCurrent: 0,
             gridSize: 0,
-            accessibleIndices: [],
+            accessibleIndices: [6, 7, 11, 12],
             originIndices: [],
         },
         treeDetail: [],
         treeEmotion: {},
         treeUuid: "",
     },
-
     setUserData: (data: UserAccount) =>
         set((state) => ({
             userData: { ...state.userData, user: data },
@@ -92,19 +88,6 @@ export const useUserStore = create<UserStore>((set) => ({
         })),
 }));
 
-interface ChatStore {
-    chatList: ChatRoom[];
-    treeList: TreeItem[]; // treeList 추가
-    treeUuid: string;
-    addChatRoom: (chatRoom: ChatRoom) => void;
-    setChatList: (chatList: ChatRoom[]) => void;
-    setTreeList: (treeList: TreeItem[]) => void; // setTreeList 추가
-    setTreeUuid: (uuid: string) => void;
-    fetchChatRooms: () => Promise<void>;
-    fetchTreeList: () => Promise<void>;
-    deleteChatRoom: (chatRoomId: string) => Promise<void>;
-}
-
 export interface ChatRoom {
     chat_room_uuid: string;
     chat_room_name: string;
@@ -112,61 +95,33 @@ export interface ChatRoom {
     created_at: string;
     tree_name: string;
 }
+
+interface ChatStore {
+    chatList: ChatRoom[];
+    treeList: TreeItem[];
+    addChatRoom: (chatRoom: ChatRoom) => void;
+    setChatList: (chatList: ChatRoom[]) => void;
+    setTreeList: (treeList: TreeItem[]) => void;
+}
+
+interface ChatStore {
+    chatList: ChatRoom[];
+    addChatRoom: (newChatRoom: ChatRoom) => void;
+}
+
 export const useChatStore = create<ChatStore>((set) => ({
     chatList: [],
-    treeList: [], // 초기값 설정
-    treeUuid: "",
-    addChatRoom: (chatRoom) =>
+    treeList: [],
+    addChatRoom: (chatRoom: ChatRoom) =>
         set((state) => ({
             chatList: [chatRoom, ...state.chatList],
         })),
-    setChatList: (chatList) =>
+    setChatList: (chatList: ChatRoom[]) =>
         set(() => ({
-            chatList: chatList,
+            chatList,
         })),
-    setTreeList: (treeList) =>
+    setTreeList: (treeList: TreeItem[]) =>
         set(() => ({
-            treeList: treeList,
+            treeList,
         })),
-    setTreeUuid: (uuid: string) =>
-        set(() => ({
-            treeUuid: uuid,
-        })),
-    fetchChatRooms: async () => {
-        try {
-            const response = await axiosInstance.get("/chat");
-            const chatRooms: ChatRoom[] = response.data;
-            set((state) => ({
-                chatList: chatRooms.map((chatRoom) => ({
-                    ...chatRoom,
-                    tree_name:
-                        state.treeList.find((tree) => tree.tree_uuid === chatRoom.tree_uuid)
-                            ?.tree_name || "Unknown",
-                })),
-            }));
-        } catch (error) {
-            console.error("Failed to fetch chat rooms:", error);
-        }
-    },
-    fetchTreeList: async () => {
-        try {
-            const response = await axiosInstance.get("/tree");
-            const treeList: TreeItem[] = response.data;
-            set({ treeList });
-        } catch (error) {
-            console.error("Failed to fetch tree list:", error);
-        }
-    },
-    deleteChatRoom: async (chatRoomId: string) => {
-        try {
-            await axiosInstance.delete(`/chat/${chatRoomId}`);
-            set((state) => ({
-                chatList: state.chatList.filter(
-                    (chatRoom) => chatRoom.chat_room_uuid !== chatRoomId
-                ),
-            }));
-        } catch (error) {
-            console.error("Failed to delete chat room:", error);
-        }
-    },
 }));

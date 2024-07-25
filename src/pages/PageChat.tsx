@@ -1,4 +1,4 @@
-import { useEffect, useState, FC } from "react";
+import { useEffect, useState } from "react";
 import ChatListHeader from "../components/common/chatList/ChatListHeader";
 import HeaderLoggedIn from "../components/common/header/HeaderLoggedIn";
 import ModalCreateChat from "../components/common/modal/ModalCreateChat";
@@ -6,9 +6,9 @@ import useUserInfo from "../hook/useInfo";
 import { useChatStore, ChatRoom } from "../config/store";
 import ChatListContent from "../components/common/chatList/ChatListContent";
 
-const PageChat: FC = () => {
+const PageChat = () => {
     const { getUserInfo } = useUserInfo();
-    const { fetchTreeList, fetchChatRooms, addChatRoom } = useChatStore();
+    const { chatList, addChatRoom } = useChatStore();
 
     useEffect(() => {
         const refreshUserInfo = async () => {
@@ -16,14 +16,6 @@ const PageChat: FC = () => {
         };
         refreshUserInfo();
     }, [getUserInfo]);
-
-    useEffect(() => {
-        const fetchInitialData = async () => {
-            await fetchTreeList();
-            await fetchChatRooms();
-        };
-        fetchInitialData();
-    }, [fetchTreeList, fetchChatRooms]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -41,7 +33,7 @@ const PageChat: FC = () => {
                 <div className="w-full h-full flex">
                     <div className="w-80 h-full border-r border-gray-600 overflow-y-auto">
                         <ChatListHeader onAddChatClick={openModal} />
-                        <ChatListContent />
+                        <ChatListContent chatList={chatList} />
                     </div>
                 </div>
             </div>

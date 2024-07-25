@@ -1,46 +1,46 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import ButtonDefault from "../button/ButtonDefault";
 import { IconClose, IconSelectArrow } from "../../../config/IconData";
 import ModalListItem from "./ModalListItem";
 import { twMerge as tw } from "tailwind-merge";
 import useVerify from "../../../hook/useVerify";
-import { CreateChatRoom } from "../../../api/chat";
-import { getTreeDataAll } from "../../../api/tree";
 import { TreeItem } from "../../../config/types";
-import { ChatRoom } from "../../../config/store";
+import { ChatRoom, useChatStore } from "../../../config/store";
+import { treeApi } from "../../../api";
+import dayjs from "dayjs";
 
 interface ModalCreateChatProps {
     onClose: () => void;
     onAddChatRoom: (newChatRoom: ChatRoom) => void;
 }
 
-const ModalCreateChat: FC<ModalCreateChatProps> = ({ onClose, onAddChatRoom }) => {
+const ModalCreateChat = ({ onClose, onAddChatRoom }: ModalCreateChatProps) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedTree, setSelectedTree] = useState<TreeItem | null>(null);
     const [chatRoomName, setChatRoomName] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const [trees, setTrees] = useState<TreeItem[]>([]);
 
     const inputRef = useRef<HTMLInputElement>(null);
     const { checkLoginStatus } = useVerify();
+    const { treeList = [], setTreeList } = useChatStore();
+
+    const getTreeList = useCallback(async () => {
+        const { data: accountResponse } = await treeApi.getTreeDataAll();
+        const formattedTreeList = accountResponse.map((tree: TreeItem) => ({
+            tree_uuid: tree.tree_uuid,
+            tree_name: tree.tree_name,
+            created_at: dayjs(tree.created_at).format("YYYY-MM-DD"),
+        }));
+        setTreeList(formattedTreeList);
+    }, [setTreeList]);
 
     useEffect(() => {
         if (inputRef.current) {
             inputRef.current.focus();
         }
 
-        const fetchTrees = async () => {
-            try {
-                const response = await getTreeDataAll();
-                const treesData: TreeItem[] = response.data;
-                setTrees(treesData);
-            } catch (error) {
-                console.error("Failed to fetch tree data:", error);
-            }
-        };
-
-        fetchTrees();
-    }, []);
+        getTreeList();
+    }, [getTreeList]);
 
     const createChatHandler = async () => {
         if (chatRoomName.trim() === "") {
@@ -54,24 +54,15 @@ const ModalCreateChat: FC<ModalCreateChatProps> = ({ onClose, onAddChatRoom }) =
         }
 
         await checkLoginStatus();
-        try {
-            const result = await CreateChatRoom({
-                chat_room_name: chatRoomName,
-                tree_uuid: selectedTree.tree_uuid,
-            });
-
-            onAddChatRoom({
-                chat_room_uuid: result.chat_room_uuid,
-                chat_room_name: chatRoomName,
-                tree_uuid: selectedTree.tree_uuid,
-                tree_name: selectedTree.tree_name,
-                created_at: new Date().toISOString(),
-            });
-
-            onClose();
-        } catch (error) {
-            console.error("Error creating chat room:", error);
-        }
+        const newChatRoom: ChatRoom = {
+            chat_room_uuid: "", // 적절한 UUID 생성 로직 필요
+            chat_room_name: chatRoomName,
+            tree_uuid: selectedTree.tree_uuid,
+            created_at: new Date().toISOString(),
+            tree_name: selectedTree.tree_name,
+        };
+        onAddChatRoom(newChatRoom);
+        onClose();
     };
 
     const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
@@ -95,7 +86,7 @@ const ModalCreateChat: FC<ModalCreateChatProps> = ({ onClose, onAddChatRoom }) =
                 value={chatRoomName}
                 onChange={(e) => {
                     setChatRoomName(e.target.value);
-                    setErrorMessage(""); // 입력값이 변경될 때 에러 메시지 초기화
+                    setErrorMessage("");
                 }}
                 className={tw(
                     "mt-6 border-b outline-none border-gray-600",
@@ -121,7 +112,7 @@ const ModalCreateChat: FC<ModalCreateChatProps> = ({ onClose, onAddChatRoom }) =
                 </div>
                 {isDropdownOpen && (
                     <ul className="absolute left-0 top-full right-0 z-10 cursor-pointer bg-gray-800">
-                        {trees.map((item) => (
+                        {treeList.map((item) => (
                             <ModalListItem
                                 key={item.tree_uuid}
                                 item={item}
@@ -131,7 +122,6 @@ const ModalCreateChat: FC<ModalCreateChatProps> = ({ onClose, onAddChatRoom }) =
                     </ul>
                 )}
             </div>
-
             <div className="text-right mt-4">
                 <ButtonDefault className="ml-1" onClick={createChatHandler}>
                     생성하기
