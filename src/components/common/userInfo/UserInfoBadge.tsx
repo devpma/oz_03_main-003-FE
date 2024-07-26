@@ -1,4 +1,3 @@
-import React from "react";
 import {
     IconAngry,
     IconHappy,
@@ -9,26 +8,7 @@ import {
 import { useUserStore } from "../../../config/store";
 import UserInfoBadgeContent from "./UserInfoBadgeContent";
 
-interface Emotions {
-    anger: string;
-    happiness: string;
-    indifference: string;
-    sadness: string;
-    worry: string;
-}
-
-interface TreeEmotion {
-    emotions: Emotions;
-    tree_uuid?: string;
-}
-
-interface UserData {
-    treeEmotion: TreeEmotion[];
-}
-
 const UserInfoBadge = () => {
-    const { userData } = useUserStore();
-
     return (
         <div className="bg-gray-800 mt-5 w-[560px] h-[450px] p-5">
             <div className="flex flex-col font-title text-base text-gray-200">
@@ -43,19 +23,19 @@ const UserInfoBadge = () => {
             </div>
             <div className="px-[18px] flex mt-10 w-full justify-between items-center">
                 <nav>
-                    <UserInfoBadgeContent type="angry" userData={userData} threshold={100} />
+                    <UserInfoBadgeContent type="angry" />
                 </nav>
                 <nav>
-                    <UserInfoBadgeContent type="happy" userData={userData} threshold={100} />
+                    <UserInfoBadgeContent type="happy" />
                 </nav>
                 <nav>
-                    <UserInfoBadgeContent type="sorrow" userData={userData} threshold={100} />
+                    <UserInfoBadgeContent type="sorrow" />
                 </nav>
                 <nav>
-                    <UserInfoBadgeContent type="worry" userData={userData} threshold={100} />
+                    <UserInfoBadgeContent type="worry" />
                 </nav>
                 <nav>
-                    <UserInfoBadgeContent type="indiff" userData={userData} threshold={100} />
+                    <UserInfoBadgeContent type="indiff" />
                 </nav>
             </div>
         </div>
