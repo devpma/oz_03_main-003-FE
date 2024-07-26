@@ -1,4 +1,4 @@
-import { TreeItem } from "../../../config/types";
+import { TreeItem } from "../../../config/store";
 
 interface ModalListItemProps {
     item: TreeItem;

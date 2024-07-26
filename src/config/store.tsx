@@ -2,10 +2,11 @@ import { create } from "zustand";
 import {
     UserAccount,
     UserLevel,
-    TreeItem,
     UserTree,
     UserTreeDetail,
     UserTreeEmotionDetail,
+    //TreeItem,
+    //ChatRoom,
 } from "./types";
 
 interface ModalStore {
@@ -88,6 +89,15 @@ export const useUserStore = create<UserStore>((set) => ({
         })),
 }));
 
+export interface TreeItem {
+    tree_uuid: string;
+    tree_name: string;
+    group_name: string;
+    tree_level: number;
+    location: number;
+    created_at: string;
+}
+
 export interface ChatRoom {
     chat_room_uuid: string;
     chat_room_name: string;
@@ -104,11 +114,6 @@ interface ChatStore {
     setTreeList: (treeList: TreeItem[]) => void;
 }
 
-interface ChatStore {
-    chatList: ChatRoom[];
-    addChatRoom: (newChatRoom: ChatRoom) => void;
-}
-
 export const useChatStore = create<ChatStore>((set) => ({
     chatList: [],
     treeList: [],
@@ -118,7 +123,7 @@ export const useChatStore = create<ChatStore>((set) => ({
         })),
     setChatList: (chatList: ChatRoom[]) =>
         set(() => ({
-            chatList,
+            chatList: chatList,
         })),
     setTreeList: (treeList: TreeItem[]) =>
         set(() => ({

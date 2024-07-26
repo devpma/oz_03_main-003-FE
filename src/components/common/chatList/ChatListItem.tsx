@@ -1,15 +1,51 @@
-import React from "react";
+import { useState } from "react";
+import { twMerge as tw } from "tailwind-merge";
+import { IconChange, IconDeleteBtn } from "../../../config/IconData";
+import ModalDeleteChat from "../modal/ModalDeleteChat";
 import { ChatRoom } from "../../../config/store";
 
 interface ChatListItemProps {
     item: ChatRoom;
 }
 
-const ChatListItem: React.FC<ChatListItemProps> = ({ item }) => {
+const ChatListItem = ({ item }: ChatListItemProps) => {
+    const [hover, setHover] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
     return (
-        <div className="p-4 border-b border-gray-600">
-            <h2 className="text-white">{item.chat_room_name}</h2>
-            <p className="text-gray-400">{item.tree_name}</p>
+        <div>
+            <div
+                className={tw(
+                    "text-white px-5 py-3 fill-white",
+                    "w-[300px] h-16 flex justify-between items-center",
+                    "hover:bg-gray-800 transition cursor-pointer"
+                )}
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
+            >
+                <nav className="flex flex-col">
+                    <div className="text-sm">{item.chat_room_name}</div>
+                    <div className="text-gray-400 text-xs">{item.created_at}</div>
+                    <div className="text-gray-400 text-xs">{item.tree_name}</div>
+                </nav>
+                {hover && (
+                    <nav className="flex gap-1">
+                        <div className="w-8 h-8 cursor-pointer rounded-full transition flex hover:bg-gray-600 justify-center items-center">
+                            <IconChange className="w-[18px] h-[18px]" />
+                        </div>
+                        <div
+                            className="w-8 h-8 cursor-pointer rounded-full transition flex hover:bg-gray-600 justify-center items-center"
+                            onClick={openModal}
+                        >
+                            <IconDeleteBtn className="w-[18px] h-[18px]" />
+                        </div>
+                    </nav>
+                )}
+            </div>
+            <ModalDeleteChat isOpen={isModalOpen} onClose={closeModal} item={item} />
         </div>
     );
 };

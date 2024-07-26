@@ -63,11 +63,3 @@ export interface TreeFormData {
     tree_level: number;
     location: number;
 }
-export interface TreeItem {
-    tree_uuid: string;
-    tree_name: string;
-    group_name: string;
-    tree_level: number;
-    location: number;
-    created_at: string;
-}
